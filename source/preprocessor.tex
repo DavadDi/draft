@@ -494,7 +494,7 @@ directives}.
 Thus, the constant expression in the following
 \tcode{\#if}
 directive and
-\tcode{if} statement\iref{stmt.if}
+\keyword{if} statement\iref{stmt.if}
 is not guaranteed to evaluate to the same value in these two
 contexts:
 \begin{codeblock}
@@ -1780,6 +1780,7 @@ an \impldef{text of \mname{TIME} when time of translation is not available} vali
 \defnxname{cpp_generic_lambdas}                   & \tcode{201707L} \\ \rowsep
 \defnxname{cpp_guaranteed_copy_elision}           & \tcode{201606L} \\ \rowsep
 \defnxname{cpp_hex_float}                         & \tcode{201603L} \\ \rowsep
+\defnxname{cpp_if_consteval}                      & \tcode{202106L} \\ \rowsep
 \defnxname{cpp_if_constexpr}                      & \tcode{201606L} \\ \rowsep
 \defnxname{cpp_impl_coroutine}                    & \tcode{201902L} \\ \rowsep
 \defnxname{cpp_impl_destroying_delete}            & \tcode{201806L} \\ \rowsep
@@ -1829,7 +1830,7 @@ are \impldef{definition and meaning of \mname{STDC}}.
 \indextext{__stdc_mb_might_neq_wc__@\mname{STDC_MB_MIGHT_NEQ_WC}}%
 \mname{STDC_MB_MIGHT_NEQ_WC}\\
 The integer literal \tcode{1}, intended to indicate that, in the encoding for
-\tcode{wchar_t}, a member of the basic character set need not have a code value equal to
+\keyword{wchar_t}, a member of the basic character set need not have a code value equal to
 its value when used as the lone character in an ordinary character literal.
 
 \item
@@ -1844,16 +1845,10 @@ are \impldef{definition and meaning of \mname{STDC_VERSION}}.
 An integer literal of the form \tcode{yyyymmL} (for example,
 \tcode{199712L}).
 If this symbol is defined, then every character in the Unicode required set, when
-stored in an object of type \tcode{wchar_t}, has the same value as the code point
+stored in an object of type \keyword{wchar_t}, has the same value as the code point
 of that character. The \defn{Unicode required set} consists of all
 the characters that are defined by ISO/IEC 10646, along with
 all amendments and technical corrigenda as of the specified year and month.
-
-\item
-\indextext{__stdcpp_strict_pointer_safety__@\mname{STDCPP_STRICT_POINTER_SAFETY}}%
-\mname{STDCPP_STRICT_POINTER_SAFETY}\\
-Defined, and has the value integer literal 1, if and only if the implementation
-has strict pointer safety\iref{basic.stc.dynamic.safety}.
 
 \item
 \indextext{__stdcpp_threads__@\mname{STDCPP_THREADS}}%

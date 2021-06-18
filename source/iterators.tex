@@ -774,6 +774,10 @@ struct indirectly_readable_traits<T>
   : @\placeholder{cond-value-type}@<typename T::element_type> { };
 
 template<@\exposconcept{has-member-value-type}@ T>
+  requires @\exposconcept{has-member-element-type}@<T>
+struct indirectly_readable_traits<T> { };
+
+template<@\exposconcept{has-member-value-type}@ T>
   requires @\exposconcept{has-member-element-type}@<T> &&
            @\libconcept{same_as}@<remove_cv_t<typename T::element_type>, remove_cv_t<typename T::value_type>>
 struct indirectly_readable_traits<T>
@@ -803,7 +807,7 @@ on program-defined types.
 \pnum
 \begin{note}
 Some legacy output iterators define a nested type named \tcode{value_type}
-that is an alias for \tcode{void}.
+that is an alias for \keyword{void}.
 These types are not \libconcept{indirectly_readable}
 and have no associated value types.
 \end{note}
@@ -846,7 +850,7 @@ the same type as
 respectively.
 The type
 \tcode{iterator_traits<I>::pointer}
-shall be \tcode{void}
+shall be \keyword{void}
 for an iterator of class type \tcode{I}
 that does not support \tcode{operator->}.
 Additionally, in the case of an output iterator, the types
@@ -855,7 +859,7 @@ iterator_traits<I>::value_type
 iterator_traits<I>::difference_type
 iterator_traits<I>::reference
 \end{codeblock}
-may be defined as \tcode{void}.
+may be defined as \keyword{void}.
 
 \pnum
 The definitions in this subclause make use of the following
@@ -936,7 +940,7 @@ using reference         = typename I::reference;
 \end{codeblock}
 If the \grammarterm{qualified-id} \tcode{I::pointer} is valid and
 denotes a type, then \tcode{iterator_traits<I>::pointer} names that type;
-otherwise, it names \tcode{void}.
+otherwise, it names \keyword{void}.
 
 \item
 Otherwise, if \tcode{I} satisfies the exposition-only concept
@@ -956,7 +960,7 @@ using reference         = @\seebelow@;
 \tcode{pointer} names that type. Otherwise, if
 \tcode{decltype(\brk{}declval<I\&>().operator->())} is well-formed, then
 \tcode{pointer} names that type. Otherwise, \tcode{pointer}
-names \tcode{void}.
+names \keyword{void}.
 
 \item If the \grammarterm{qualified-id} \tcode{I::reference} is valid and denotes a
 type, \tcode{reference} names that type. Otherwise, \tcode{reference}
@@ -998,7 +1002,7 @@ using reference         = void;
 \end{codeblock}
 If the \grammarterm{qualified-id}
 \tcode{incrementable_traits<I>::difference_type} is valid and denotes a type,
-then \tcode{difference_type} names that type; otherwise, it names \tcode{void}.
+then \tcode{difference_type} names that type; otherwise, it names \keyword{void}.
 
 \item
 Otherwise, \tcode{iterator_traits<I>}
@@ -1291,9 +1295,9 @@ Assignment through the same value of the indirectly writable type happens only o
 
 \pnum
 \begin{note}
-\libconcept{indirectly_writable} has the awkward \tcode{const_cast} expressions to reject
+\libconcept{indirectly_writable} has the awkward \keyword{const_cast} expressions to reject
 iterators with prvalue non-proxy reference types that permit rvalue
-assignment but do not also permit \tcode{const} rvalue assignment.
+assignment but do not also permit \keyword{const} rvalue assignment.
 Consequently, an iterator type \tcode{I} that returns \tcode{std::string}
 by value does not model \tcode{\libconcept{indirectly_writable}<I, std::string>}.
 \end{note}
@@ -1315,7 +1319,7 @@ template<class T>
 
 template<class I>
   concept @\deflibconcept{weakly_incrementable}@ =
-    @\libconcept{default_initializable}@<I> && @\libconcept{movable}@<I> &&
+    @\libconcept{movable}@<I> &&
     requires(I i) {
       typename iter_difference_t<I>;
       requires @\exposid{is-signed-integer-like}@<iter_difference_t<I>>;
@@ -1915,7 +1919,7 @@ A type \tcode{X} meets the \defnoldconcept{Iterator} requirements if:
 \oldconcept{Destructible} requirements\iref{utility.arg.requirements} and lvalues
 of type \tcode{X} are swappable\iref{swappable.requirements}, and
 
-\item \tcode{iterator_traits<X>::difference_type} is a signed integer type or \tcode{void}, and
+\item \tcode{iterator_traits<X>::difference_type} is a signed integer type or \keyword{void}, and
 
 \item the expressions in \tref{iterator} are valid and have
 the indicated semantics.
@@ -3717,7 +3721,7 @@ namespace std {
   template<class Container>
   class back_insert_iterator {
   protected:
-    Container* container = nullptr;
+    Container* container;
 
   public:
     using iterator_category = output_iterator_tag;
@@ -3727,7 +3731,6 @@ namespace std {
     using reference         = void;
     using container_type    = Container;
 
-    constexpr back_insert_iterator() noexcept = default;
     constexpr explicit back_insert_iterator(Container& x);
     constexpr back_insert_iterator& operator=(const typename Container::value_type& value);
     constexpr back_insert_iterator& operator=(typename Container::value_type&& value);
@@ -3829,7 +3832,7 @@ namespace std {
   template<class Container>
   class front_insert_iterator {
   protected:
-    Container* container = nullptr;
+    Container* container;
 
   public:
     using iterator_category = output_iterator_tag;
@@ -3839,7 +3842,6 @@ namespace std {
     using reference         = void;
     using container_type    = Container;
 
-    constexpr front_insert_iterator() noexcept = default;
     constexpr explicit front_insert_iterator(Container& x);
     constexpr front_insert_iterator& operator=(const typename Container::value_type& value);
     constexpr front_insert_iterator& operator=(typename Container::value_type&& value);
@@ -3941,8 +3943,8 @@ namespace std {
   template<class Container>
   class insert_iterator {
   protected:
-    Container* container = nullptr;
-    ranges::iterator_t<Container> iter = ranges::iterator_t<Container>();
+    Container* container;
+    ranges::iterator_t<Container> iter;
 
   public:
     using iterator_category = output_iterator_tag;
@@ -3952,7 +3954,6 @@ namespace std {
     using reference         = void;
     using container_type    = Container;
 
-    insert_iterator() = default;
     constexpr insert_iterator(Container& x, ranges::iterator_t<Container> i);
     constexpr insert_iterator& operator=(const typename Container::value_type& value);
     constexpr insert_iterator& operator=(typename Container::value_type&& value);
@@ -4638,7 +4639,7 @@ constexpr move_sentinel();
 \effects
 Value-initializes \tcode{last}.
 If \tcode{is_trivially_default_constructible_v<S>} is \tcode{true},
-then this constructor is a \tcode{constexpr} constructor.
+then this constructor is a \keyword{constexpr} constructor.
 \end{itemdescr}
 
 \indexlibraryctor{move_sentinel}%
@@ -4728,7 +4729,7 @@ namespace std {
     requires (!@\libconcept{same_as}@<I, S> && @\libconcept{copyable}@<I>)
   class common_iterator {
   public:
-    constexpr common_iterator() = default;
+    constexpr common_iterator() requires @\libconcept{default_initializable}@<I> = default;
     constexpr common_iterator(I i);
     constexpr common_iterator(S s);
     template<class I2, class S2>
@@ -4814,7 +4815,7 @@ otherwise it denotes \tcode{input_iterator_tag}.
 If the expression \tcode{a.operator->()} is well-formed,
 where \tcode{a} is an lvalue of type \tcode{const common_iterator<I, S>},
 then \tcode{pointer} denotes the type of that expression.
-Otherwise, \tcode{pointer} denotes \tcode{void}.
+Otherwise, \tcode{pointer} denotes \keyword{void}.
 \end{itemize}
 
 \rSec3[common.iter.const]{Constructors and conversions}
@@ -5004,8 +5005,8 @@ return tmp;
 Otherwise, if
 \tcode{requires (I\& i) \{ \{ *i++ \} -> \exposconceptnc{can-reference}; \}}
 is \tcode{true} or
-\tcode{\libconceptx{constructible_\newline{}from}{constructible_from}<iter_value_t<I>, iter_reference_t<I>>}
-is \tcode{false},
+\tcode{\libconceptx{constructible_\newline{}from}{constructible_from}<iter_value_t<I>, iter_reference_t<I>> \&\& \libconcept{move_constructible}<iter_value_t<I>>}
+is \linebreak \tcode{false},
 equivalent to:
 \begin{codeblock}
 return get<I>(v_)++;
@@ -5021,7 +5022,7 @@ where \exposid{postfix-proxy} is the exposition-only class:
 class @\exposid{postfix-proxy}@ {
   iter_value_t<I> keep_;
   @\exposid{postfix-proxy}@(iter_reference_t<I>&& x)
-    : keep_(std::move(x)) {}
+    : keep_(std::forward<iter_reference_t<I>>(x)) {}
 public:
   const iter_value_t<I>& operator*() const {
     return keep_;
@@ -5176,9 +5177,10 @@ Two values \tcode{i1} and \tcode{i2} of types
 and
 \tcode{counted_iterator<I2>}
 refer to elements of the same sequence if and only if
-\tcode{next(i1.base(), i1.count())}
+there exists some integer $n$ such that
+\tcode{next(i1.base(), i1.count() + $n$)}
 and
-\tcode{next(i2.base(), i2.count())}
+\tcode{next(i2.base(), i2.count() + $n$)}
 refer to the same (possibly past-the-end) element.
 
 \indexlibraryglobal{counted_iterator}%
@@ -5195,7 +5197,7 @@ namespace std {
                         // if the \grammarterm{qualified-id} \tcode{I::iterator_concept} is valid and denotes a type
     using iterator_category = typename I::iterator_category;    // present only
                         // if the \grammarterm{qualified-id} \tcode{I::iterator_category} is valid and denotes a type
-    constexpr counted_iterator() = default;
+    constexpr counted_iterator() requires @\libconcept{default_initializable}@<I> = default;
     constexpr counted_iterator(I x, iter_difference_t<I> n);
     template<class I2>
       requires @\libconcept{convertible_to}@<const I2&, I>
@@ -5846,7 +5848,7 @@ Constructs the end-of-stream iterator, value-initializing \tcode{value}.
 \remarks
 If the initializer \tcode{T()} in the declaration \tcode{auto x = T();}
 is a constant initializer\iref{expr.const},
-then these constructors are \tcode{constexpr} constructors.
+then these constructors are \keyword{constexpr} constructors.
 \end{itemdescr}
 
 
@@ -6023,7 +6025,6 @@ namespace std {
     using traits_type       = traits;
     using ostream_type      = basic_ostream<charT,traits>;
 
-    constexpr ostream_iterator() noexcept = default;
     ostream_iterator(ostream_type& s);
     ostream_iterator(ostream_type& s, const charT* delimiter);
     ostream_iterator(const ostream_iterator& x);
@@ -6036,8 +6037,8 @@ namespace std {
     ostream_iterator& operator++(int);
 
   private:
-    basic_ostream<charT,traits>* out_stream = nullptr;          // \expos
-    const charT* delim = nullptr;                               // \expos
+    basic_ostream<charT,traits>* out_stream;            // \expos
+    const charT* delim;                                 // \expos
   };
 }
 \end{codeblock}
@@ -6053,7 +6054,7 @@ ostream_iterator(ostream_type& s);
 \pnum
 \effects
 Initializes \tcode{out_stream} with \tcode{addressof(s)} and
-\tcode{delim} with \tcode{nullptr}.
+\tcode{delim} with \keyword{nullptr}.
 \end{itemdescr}
 
 
@@ -6140,7 +6141,7 @@ and the constructor
 both construct an end-of-stream iterator object suitable for use
 as an end-of-range.
 All specializations of \tcode{istreambuf_iterator} shall have a trivial copy
-constructor, a \tcode{constexpr} default constructor, and a trivial destructor.
+constructor, a \keyword{constexpr} default constructor, and a trivial destructor.
 
 \pnum
 The result of
@@ -6240,7 +6241,7 @@ constexpr istreambuf_iterator(default_sentinel_t) noexcept;
 \begin{itemdescr}
 \pnum
 \effects
-Initializes \tcode{sbuf_} with \tcode{nullptr}.
+Initializes \tcode{sbuf_} with \keyword{nullptr}.
 \end{itemdescr}
 
 
@@ -6385,7 +6386,6 @@ namespace std {
     using streambuf_type    = basic_streambuf<charT,traits>;
     using ostream_type      = basic_ostream<charT,traits>;
 
-    constexpr ostreambuf_iterator() noexcept = default;
     ostreambuf_iterator(ostream_type& s) noexcept;
     ostreambuf_iterator(streambuf_type* s) noexcept;
     ostreambuf_iterator& operator=(charT c);
@@ -6396,7 +6396,7 @@ namespace std {
     bool failed() const noexcept;
 
   private:
-    streambuf_type* sbuf_ = nullptr;    // \expos
+    streambuf_type* sbuf_;              // \expos
   };
 }
 \end{codeblock}

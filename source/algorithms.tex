@@ -156,7 +156,7 @@ it should work correctly in the construct
 \tcode{pred(*first)} contextually converted to \tcode{bool}\iref{conv}.
 The function object \tcode{pred} shall not apply any non-constant function
 through the dereferenced iterator.
-Given a glvalue \tcode{u} of type (possibly \tcode{const}) \tcode{T}
+Given a glvalue \tcode{u} of type (possibly \keyword{const}) \tcode{T}
 that designates the same object as \tcode{*first},
 \tcode{pred(u)} shall be a valid expression
 that is equal to \tcode{pred(*first)}.
@@ -181,9 +181,9 @@ is part of the signature, it should work correctly in the construct
 \tcode{binary_pred(*first1, value)} contextually converted to \tcode{bool}\iref{conv}.
 \tcode{binary_pred} shall not apply any non-constant function
 through the dereferenced iterators.
-Given a glvalue \tcode{u} of type (possibly \tcode{const}) \tcode{T1}
+Given a glvalue \tcode{u} of type (possibly \keyword{const}) \tcode{T1}
 that designates the same object as \tcode{*first1}, and
-a glvalue \tcode{v} of type (possibly \tcode{const}) \tcode{T2}
+a glvalue \tcode{v} of type (possibly \keyword{const}) \tcode{T2}
 that designates the same object as \tcode{*first2},
 \tcode{binary_pred(u, *first2)},
 \tcode{binary_pred(*first1, v)}, and
@@ -1130,6 +1130,36 @@ namespace std {
   template<class ForwardIterator, class Searcher>
     constexpr ForwardIterator
       search(ForwardIterator first, ForwardIterator last, const Searcher& searcher);
+
+  namespace ranges {
+    // \ref{alg.starts.with}, starts with
+    template<@\libconcept{input_iterator}@ I1, @\libconcept{sentinel_for}@<I1> S1, @\libconcept{input_iterator}@ I2, @\libconcept{sentinel_for}@<I2> S2,
+             class Pred = ranges::equal_to, class Proj1 = identity, class Proj2 = identity>
+      requires @\libconcept{indirectly_comparable}@<I1, I2, Pred, Proj1, Proj2>
+      constexpr bool starts_with(I1 first1, S1 last1, I2 first2, S2 last2, Pred pred = {},
+                                 Proj1 proj1 = {}, Proj2 proj2 = {});
+    template<@\libconcept{input_range}@ R1, @\libconcept{input_range}@ R2, class Pred = ranges::equal_to,
+             class Proj1 = identity, class Proj2 = identity>
+      requires @\libconcept{indirectly_comparable}@<iterator_t<R1>, iterator_t<R2>, Pred, Proj1, Proj2>
+      constexpr bool starts_with(R1&& r1, R2&& r2, Pred pred = {},
+                                 Proj1 proj1 = {}, Proj2 proj2 = {});
+
+    // \ref{alg.ends.with}, ends with
+    template<@\libconcept{input_iterator}@ I1, @\libconcept{sentinel_for}@<I1> S1, @\libconcept{input_iterator}@ I2, @\libconcept{sentinel_for}@<I2> S2,
+             class Pred = ranges::equal_to, class Proj1 = identity, class Proj2 = identity>
+      requires (@\libconcept{forward_iterator}@<I1> || @\libconcept{sized_sentinel_for}@<S1, I1>) &&
+               (@\libconcept{forward_iterator}@<I2> || @\libconcept{sized_sentinel_for}@<S2, I2>) &&
+               @\libconcept{indirectly_comparable}@<I1, I2, Pred, Proj1, Proj2>
+      constexpr bool ends_with(I1 first1, S1 last1, I2 first2, S2 last2, Pred pred = {},
+                               Proj1 proj1 = {}, Proj2 proj2 = {});
+    template<@\libconcept{input_range}@ R1, @\libconcept{input_range}@ R2, class Pred = ranges::equal_to,
+             class Proj1 = identity, class Proj2 = identity>
+      requires (@\libconcept{forward_range}@<R1> || @\libconcept{sized_range}@<R1>) &&
+               (@\libconcept{forward_range}@<R2> || @\libconcept{sized_range}@<R2>) &&
+               @\libconcept{indirectly_comparable}@<iterator_t<R1>, iterator_t<R2>, Pred, Proj1, Proj2>
+      constexpr bool ends_with(R1&& r1, R2&& r2, Pred pred = {},
+                               Proj1 proj1 = {}, Proj2 proj2 = {});
+  }
 
   // \ref{alg.modifying.operations}, mutating sequence operations
   // \ref{alg.copy}, copy
@@ -4217,6 +4247,81 @@ Equivalent to: \tcode{return searcher(first, last).first;}
 \pnum
 \remarks
 \tcode{Searcher} need not meet the \oldconcept{CopyConstructible} requirements.
+\end{itemdescr}
+
+\rSec2[alg.starts.with]{Starts with}
+
+\indexlibraryglobal{starts_with}%
+\begin{itemdecl}
+template<@\libconcept{input_iterator}@ I1, @\libconcept{sentinel_for}@<I1> S1, @\libconcept{input_iterator}@ I2, @\libconcept{sentinel_for}@<I2> S2,
+         class Pred = ranges::equal_to, class Proj1 = identity, class Proj2 = identity>
+  requires @\libconcept{indirectly_comparable}@<I1, I2, Pred, Proj1, Proj2>
+  constexpr bool ranges::starts_with(I1 first1, S1 last1, I2 first2, S2 last2, Pred pred = {},
+                                     Proj1 proj1 = {}, Proj2 proj2 = {});
+template<@\libconcept{input_range}@ R1, @\libconcept{input_range}@ R2, class Pred = ranges::equal_to, class Proj1 = identity,
+         class Proj2 = identity>
+  requires @\libconcept{indirectly_comparable}@<iterator_t<R1>, iterator_t<R2>, Pred, Proj1, Proj2>
+  constexpr bool ranges::starts_with(R1&& r1, R2&& r2, Pred pred = {},
+                                     Proj1 proj1 = {}, Proj2 proj2 = {});
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns
+\begin{codeblock}
+ranges::mismatch(std::move(first1), last1, std::move(first2), last2,
+                 pred, proj1, proj2).in2 == last2
+\end{codeblock}
+\end{itemdescr}
+
+\rSec2[alg.ends.with]{Ends with}
+
+\indexlibraryglobal{ends_with}%
+\begin{itemdecl}
+template<@\libconcept{input_iterator}@ I1, @\libconcept{sentinel_for}@<I1> S1, @\libconcept{input_iterator}@ I2, @\libconcept{sentinel_for}@<I2> S2,
+         class Pred = ranges::equal_to, class Proj1 = identity, class Proj2 = identity>
+  requires (@\libconcept{forward_iterator}@<I1> || @\libconcept{sized_sentinel_for}@<S1, I1>) &&
+           (@\libconcept{forward_iterator}@<I2> || @\libconcept{sized_sentinel_for}@<S2, I2>) &&
+           @\libconcept{indirectly_comparable}@<I1, I2, Pred, Proj1, Proj2>
+  constexpr bool ranges::ends_with(I1 first1, S1 last1, I2 first2, S2 last2, Pred pred = {},
+                                   Proj1 proj1 = {}, Proj2 proj2 = {});
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+Let \tcode{N1} be \tcode{last1 - first1} and
+\tcode{N2} be \tcode{last2 - first2}.
+
+\pnum
+\returns
+\tcode{false} if $\tcode{N1} < \tcode{N2}$, otherwise
+\begin{codeblock}
+ranges::equal(std::move(first1) + (N1 - N2), last1, std::move(first2), last2,
+              pred, proj1, proj2)
+\end{codeblock}
+\end{itemdescr}
+
+\begin{itemdecl}
+template<@\libconcept{input_range}@ R1, @\libconcept{input_range}@ R2, class Pred = ranges::equal_to, class Proj1 = identity,
+         class Proj2 = identity>
+  requires (@\libconcept{forward_range}@<R1> || @\libconcept{sized_range}@<R1>) &&
+           (@\libconcept{forward_range}@<R2> || @\libconcept{sized_range}@<R2>) &&
+           @\libconcept{indirectly_comparable}@<iterator_t<R1>, iterator_t<R2>, Pred, Proj1, Proj2>
+  constexpr bool ranges::ends_with(R1&& r1, R2&& r2, Pred pred = {},
+                                   Proj1 proj1 = {}, Proj2 proj2 = {});
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+Let \tcode{N1} be \tcode{ranges::distance(r1)} and
+\tcode{N2} be \tcode{ranges::distance(r2)}.
+
+\pnum
+\returns
+\tcode{false} if $\tcode{N1} < \tcode{N2}$, otherwise
+\begin{codeblock}
+ranges::equal(ranges::drop_view(ranges::ref_view(r1), N1 - N2), r2, pred, proj1, proj2)
+\end{codeblock}
 \end{itemdescr}
 
 \rSec1[alg.modifying.operations]{Mutating sequence operations}
@@ -8619,22 +8724,22 @@ template<class InputIterator1, class InputIterator2, class Cmp>
 
 \begin{itemdescr}
 \pnum
+Let $N$ be $\min(\tcode{e1 - b1}, \tcode{e2 - b2})$.
+Let $E(n)$ be \tcode{comp(*(b1 + $n$), *(b2 + $n$))}.
+
+\pnum
 \mandates
 \tcode{decltype(comp(*b1, *b2))} is a comparison category type.
 
 \pnum
-\effects
-Lexicographically compares two ranges and
-produces a result of the strongest applicable comparison category type.
-Equivalent to:
-\begin{codeblock}
-for ( ; b1 != e1 && b2 != e2; void(++b1), void(++b2) )
-  if (auto cmp = comp(*b1,*b2); cmp != 0)
-    return cmp;
-return b1 != e1 ? strong_ordering::greater :
-       b2 != e2 ? strong_ordering::less :
-                  strong_ordering::equal;
-\end{codeblock}
+\returns
+$E(i)$, where $i$ is the smallest integer in \range{0}{$N$}
+such that \tcode{$E(i)$ != 0} is \tcode{true}, or
+\tcode{(e1 - b1) <=> (e2 - b2)} if no such integer exists.
+
+\pnum
+\complexity
+At most $N$ applications of \tcode{comp}.
 \end{itemdescr}
 
 \indexlibraryglobal{lexicographical_compare_three_way}%
@@ -10831,7 +10936,8 @@ void qsort(void* base, size_t nmemb, size_t size, @\placeholder{compare-pred}@* 
 \begin{itemdescr}
 \pnum
 \expects
-The objects in the array pointed to by \tcode{base} are of trivial type.
+For \tcode{qsort}, the objects in the array pointed to by \tcode{base}
+are of trivially copyable type.
 
 \pnum
 \effects

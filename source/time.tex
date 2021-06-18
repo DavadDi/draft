@@ -28,7 +28,7 @@ utilities, as summarized in \tref{time.summary}.
 \indextext{STATICALLY-WIDEN@\exposid{STATICALLY-WIDEN}}%
 Let \exposid{STATICALLY-WIDEN}\tcode{<charT>("...")} be
 \tcode{"..."} if \tcode{charT} is \tcode{char} and
-\tcode{L"..."} if \tcode{charT} is \tcode{wchar_t}.
+\tcode{L"..."} if \tcode{charT} is \keyword{wchar_t}.
 
 \rSec1[time.syn]{Header \tcode{<chrono>} synopsis}
 
@@ -1135,7 +1135,7 @@ least common multiple of \tcode{Period1::den} and \tcode{Period2::den}.
 
 \pnum
 \begin{note}
-The \tcode{typedef} name \tcode{type} is a synonym for the
+The \keyword{typedef} name \tcode{type} is a synonym for the
 \tcode{duration} with the largest tick \tcode{period} possible where both
 \tcode{duration} arguments will convert to it without requiring a division
 operation. The representation of this type is intended to be able to hold any
@@ -1821,7 +1821,7 @@ ToDuration(static_cast<typename ToDuration::rep>(
 \pnum
 \begin{note}
 This function does not use any implicit conversions; all conversions
-are done with \tcode{static_cast}. It avoids multiplications and divisions when
+are done with \keyword{static_cast}. It avoids multiplications and divisions when
 it is known at compile time that one or more arguments is 1. Intermediate
 computations are carried out in the widest representation and only converted to
 the destination representation at the final step.
@@ -2156,9 +2156,8 @@ Attempts to parse the input stream \tcode{is}
 into the duration \tcode{d}
 using the format flags given in the NTCTS \tcode{fmt}
 as specified in \ref{time.parse}.
-If the parse parses everything specified by the parsing format flags without error,
-and yet none of the flags impacts a duration,
-\tcode{d} will be assigned a zero value.
+If the parse fails to decode a valid duration,
+\tcode{is.setstate(ios_base::failbit)} is called and \tcode{d} is not modified.
 If \tcode{\%Z} is used and successfully parsed,
 that value will be assigned to \tcode{*abbrev} if \tcode{abbrev} is non-null.
 If \tcode{\%z} (or a modified variant) is used and successfully parsed,
@@ -3717,8 +3716,8 @@ template<class Duration>
 
 \pnum
 \mandates
-\tcode{SourceClock::to_sys(t)} returns a \tcode{sys_time<Duration>},
-where \tcode{Duration} is a valid \tcode{chrono::duration} specialization.
+\tcode{SourceClock::to_sys(t)} returns a \tcode{sys_time<Duration2>},
+where \tcode{Duration2} is a valid \tcode{chrono::duration} specialization.
 
 \pnum
 \returns
@@ -3748,8 +3747,8 @@ template<class Duration>
 
 \pnum
 \mandates
-\tcode{DestClock::from_sys(t)} returns a \tcode{time_point<DestClock, Duration>},
-where \tcode{Duration} is a valid \tcode{chrono::duration} specialization.
+\tcode{DestClock::from_sys(t)} returns a \tcode{time_point<DestClock, Duration2>},
+where \tcode{Dura\-tion2} is a valid \tcode{chrono::duration} specialization.
 
 \pnum
 \returns
@@ -3781,8 +3780,8 @@ template<class Duration>
 
 \pnum
 \mandates
-\tcode{SourceClock::to_utc(t)}  returns a \tcode{utc_time<Duration>},
-where \tcode{Duration} is a valid \tcode{chrono::duration} specialization.
+\tcode{SourceClock::to_utc(t)}  returns a \tcode{utc_time<Duration2>},
+where \tcode{Duration2} is a valid \tcode{chrono::duration} specialization.
 
 \pnum
 \returns
@@ -3812,8 +3811,8 @@ template<class Duration>
 
 \pnum
 \mandates
-\tcode{DestClock::from_utc(t)} returns a \tcode{time_point<DestClock, Duration>},
-where \tcode{Duration} is a valid \tcode{chrono::duration} specialization.
+\tcode{DestClock::from_utc(t)} returns a \tcode{time_point<DestClock, Duration2>},
+where \tcode{Dura\-tion2} is a valid \tcode{chrono::duration} specialization.
 
 \pnum
 \returns
